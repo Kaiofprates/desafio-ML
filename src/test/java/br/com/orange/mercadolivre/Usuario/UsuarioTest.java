@@ -1,8 +1,7 @@
 package br.com.orange.mercadolivre.Usuario;
 
-import org.junit.Assert;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -29,8 +28,9 @@ public class UsuarioTest {
             "    \"senha\" : \"123456\"\n" +
             "}";
 
+    @Test
     @DisplayName("Deveria lidar com o sucesso no cadastro de usuário")
-    @Test(expected = AssertionError.class)
+
     public void criaUsuarioTeste() throws  Exception{
 
         /*
@@ -46,7 +46,7 @@ public class UsuarioTest {
     }
 
     @DisplayName("Deveria lidar com login (email) branco ou nulo")
-    @Test(expected = AssertionError.class)
+    @Test
     public void emailVazioTeste() throws  Exception{
 
         String usuarioNullouVazio = "{\n" +
@@ -59,14 +59,14 @@ public class UsuarioTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(usuarioNullouVazio)
         ).andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(jsonPath("$.field").isString())
-                .andExpect(jsonPath("$.status").isNumber())
-                .andExpect(jsonPath("$.error").value("O campo email não pode estar vazio"))
+                .andExpect(jsonPath("$[0].field").isString())
+                .andExpect(jsonPath("$[0].status").isNumber())
+                .andExpect(jsonPath("$[0].error").value("O campo email não pode estar vazio"))
                 .andDo(MockMvcResultHandlers.print());
     }
 
     @DisplayName("Deveria lidar com login (email) com formato inválido")
-    @Test(expected = AssertionError.class)
+    @Test
     public void emailFormatoInvalidoTeste() throws  Exception{
 
         String emailMalFormatado = "{\n" +
@@ -79,14 +79,14 @@ public class UsuarioTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(emailMalFormatado)
         ).andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(jsonPath("$.field").isString())
-                .andExpect(jsonPath("$.status").isNumber())
-                .andExpect(jsonPath("$.error").value("O campo email deve ter um formato válido"))
+                .andExpect(jsonPath("$[0].field").isString())
+                .andExpect(jsonPath("$[0].status").isNumber())
+                .andExpect(jsonPath("$[0].error").value("O campo email deve ter um formato válido"))
                 .andDo(MockMvcResultHandlers.print());
     }
 
     @DisplayName("Deveria lidar com a senha branca ou nula")
-    @Test(expected = AssertionError.class)
+    @Test
     public void senhaBrancaOuNulaTeste() throws  Exception{
 
         String senhaBrancaOuNula = "{\n" +
@@ -99,14 +99,14 @@ public class UsuarioTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(senhaBrancaOuNula)
         ).andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(jsonPath("$.field").isString())
-                .andExpect(jsonPath("$.status").isNumber())
-                .andExpect(jsonPath("$.error").value("O campo de senha não deve ser nulo ou em branco"))
+                .andExpect(jsonPath("$[0].field").isString())
+                .andExpect(jsonPath("$[0].status").isNumber())
+                .andExpect(jsonPath("$[0].error").value("O campo senha não deve estar em branco"))
                 .andDo(MockMvcResultHandlers.print());
     }
 
     @DisplayName("Deveria lidar com uma senha com o tamanho menor que 6 caracteres")
-    @Test(expected = AssertionError.class)
+    @Test
     public void senhaSemTamanhoMinimo() throws  Exception{
 
         String senhaMenor = "{\n" +
@@ -119,9 +119,9 @@ public class UsuarioTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(senhaMenor)
         ).andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(jsonPath("$.field").isString())
-                .andExpect(jsonPath("$.status").isNumber())
-                .andExpect(jsonPath("$.error").value("O campo de senha deve ter no minimo 6 caracteres"))
+                .andExpect(jsonPath("$[0].field").isString())
+                .andExpect(jsonPath("$[0].status").isNumber())
+                .andExpect(jsonPath("$[0].error").value("O campo senha deve ter no mínimo 6 caracteres"))
                 .andDo(MockMvcResultHandlers.print());
     }
 
