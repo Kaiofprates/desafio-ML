@@ -1,4 +1,4 @@
-package br.com.orange.mercadolivre.exceptions;
+package br.com.orange.mercadolivre.handlers.exceptions;
 
 import java.time.LocalDateTime;
 

@@ -1,6 +1,7 @@
 package br.com.orange.mercadolivre.Usuario;
 
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -22,6 +27,16 @@ public class UsuarioTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @PersistenceContext
+    private EntityManager manager;
+
+    @Transactional
+    private void populaBanco(){
+        Usuario usuario = new Usuario("johndoe@email.com","123456");
+        manager.persist(usuario);
+    }
+
 
     String usuarioRequest = "{\n" +
             "    \"email\" : \"johndoe@email.com\",\n" +
@@ -43,6 +58,23 @@ public class UsuarioTest {
                     .content(this.usuarioRequest)
             ).andExpect(MockMvcResultMatchers.status().isOk())
                     .andDo(MockMvcResultHandlers.print());
+    }
+    @Test
+    @DisplayName("Deveria lidar com o email duplicado no banco de dados")
+    @Transactional
+    public void emailDuplicadoTeste() throws  Exception{
+
+        populaBanco();
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/mercadolivre/usuario")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(this.usuarioRequest)
+        ).andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(jsonPath("$[0].field").isString())
+                .andExpect(jsonPath("$[0].status").isNumber())
+                .andExpect(jsonPath("$[0].error").value("duplicate values"))
+                .andDo(MockMvcResultHandlers.print());
     }
 
     @DisplayName("Deveria lidar com login (email) branco ou nulo")
@@ -124,6 +156,8 @@ public class UsuarioTest {
                 .andExpect(jsonPath("$[0].error").value("O campo senha deve ter no mínimo 6 caracteres"))
                 .andDo(MockMvcResultHandlers.print());
     }
+
+
 
 }
 
